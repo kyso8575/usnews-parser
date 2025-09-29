@@ -1,4 +1,4 @@
-# US News University Data Parser
+# US News University Parser
 
 A comprehensive web scraping tool for extracting university data from US News & World Report.
 

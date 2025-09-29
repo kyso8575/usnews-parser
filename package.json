@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/main.ts",
+    "start": "npx tsx src/main.ts",
     "dev": "nodemon --watch src --ext ts --exec 'npx tsx src/main.ts'",
-    "build": "tsc",
-    "run:js": "node dist/main.js"
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
