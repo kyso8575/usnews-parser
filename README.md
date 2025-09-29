@@ -32,8 +32,24 @@ npm install
 ### Extract University Data
 
 ```bash
-npm run build
-npm start
+# Extract all universities (creates individual JSON files + unified JSON)
+npm run extract
+
+# Extract specific university
+npm run extract "Harvard_University"
+
+# Generate only unified JSON from existing individual files
+npm run unified
+```
+
+### MongoDB Integration
+
+```bash
+# Generate unified JSON for MongoDB
+npm run unified
+
+# Import to MongoDB (requires MongoDB running locally)
+npm run import-mongo
 ```
 
 ### Generate Excel Files
@@ -72,8 +88,10 @@ The `data/extraction-config.json` file contains:
 
 ## Output
 
-- **JSON Files**: Individual university data in `output/` directory
+- **Individual JSON Files**: Separate files per university in `output/` directory
+- **Unified JSON**: Single `output-unified.json` file ready for MongoDB import
 - **Excel Files**: Comprehensive spreadsheets with examples
+- **MongoDB Import Script**: Automated import script (`import-to-mongo.sh`)
 - **Structured Data**: 450+ fields per university
 
 ## Supported Universities

@@ -57,13 +57,62 @@ function processUniversity(universityName: string): void {
   console.log(`✅ ${universityName} completed`);
 }
 
+// -------------------- Unified JSON Generation --------------------
+function createUnifiedOutput(): void {
+  console.log('\n🔄 Creating unified JSON output for MongoDB...');
+  
+  const outputDir = path.resolve('./output');
+  const allJsonFiles = fs.readdirSync(outputDir)
+    .filter(file => file.endsWith('.json'))
+    .sort();
+
+  console.log(`📖 Reading ${allJsonFiles.length} university data files...`);
+
+  const unifiedUniversities: any[] = [];
+
+  allJsonFiles.forEach(file => {
+    const filePath = path.join(outputDir, file);
+    const universityName = path.basename(file, '.json').replace(/_/g, ' ');
+    
+    try {
+      const universityData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      
+      // MongoDB-friendly structure
+      const universityDocument = {
+        _id: universityName,
+        name: universityName,
+        slug: path.basename(file, '.json'),
+        ...universityData
+      };
+      
+      unifiedUniversities.push(universityDocument);
+    } catch (error) {
+      console.error(`❌ Error processing ${file}:`, error);
+    }
+  });
+
+  // Save unified output
+  const unifiedPath = path.resolve('./output-unified.json');
+  fs.writeFileSync(unifiedPath, JSON.stringify(unifiedUniversities, null, 2));
+  
+  console.log(`✅ Unified JSON created: ${unifiedPath}`);
+  console.log(`📊 Total universities: ${unifiedUniversities.length}`);
+  console.log(`💾 Ready for MongoDB import!`);
+}
+
 // Get command line argument or process all universities
 const args = process.argv.slice(2);
 
 if (args.length > 0) {
-  // Process specific university
-  const universityName = args[0];
-  processUniversity(universityName);
+  const command = args[0];
+  
+  if (command === 'unified') {
+    // Generate unified JSON only
+    createUnifiedOutput();
+  } else {
+    // Process specific university
+    processUniversity(command);
+  }
 } else {
   // Process all universities
   const htmlDir = path.resolve("./data/html");
@@ -102,4 +151,9 @@ if (args.length > 0) {
   console.log(`Total universities: ${universities.length}`);
   console.log(`Successful: ${successCount}`);
   console.log(`Failed: ${errorCount}`);
+  
+  // Automatically create unified output after processing all universities
+  if (successCount > 0) {
+    createUnifiedOutput();
+  }
 }

@@ -5,7 +5,10 @@
   "scripts": {
     "start": "npx tsx src/main.ts",
     "dev": "nodemon --watch src --ext ts --exec 'npx tsx src/main.ts'",
-    "build": "tsc"
+    "build": "tsc",
+    "extract": "npx tsx src/main.ts",
+    "unified": "npx tsx src/main.ts unified",
+    "import-mongo": "./import-to-mongo.sh"
   },
   "author": "",
   "license": "ISC",
