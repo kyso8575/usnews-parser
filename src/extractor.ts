@@ -279,3 +279,83 @@ export function saveResults(data: Record<string, unknown>, filename: string): vo
   fs.writeFileSync(outputPath, JSON.stringify(data, null, 2));
   console.log(`Results saved to: ${outputPath}`);
 }
+
+// -------------------- Ranking Data Custom Processing --------------------
+export function processRankingsData(universityData: any): any {
+  // 안전하게 복사
+  const processedData = { ...universityData };
+  
+  if (processedData['overallRankings.allRankings'] && Array.isArray(processedData['overallRankings.allRankings'])) {
+    const rankings = processedData['overallRankings.allRankings'];
+    const rankingsObject: any = {
+      nationalRanking: null,
+      bestValueSchools: null,
+      engineeringPrograms: null,
+      computerScience: null,
+      psychologyPrograms: null,
+      economics: null,
+      writingInDisciplines: null,
+      undergraduateResearch: null,
+      serviceLearning: null,
+      firstYearExperiences: null,
+      seniorCapstone: null,
+      collegesForVeterans: null,
+      undergraduateTeaching: null,
+      innovativeSchools: null,
+      socialMobility: null
+    };
+
+    rankings.forEach((ranking: string) => {
+      try {
+        // Ranking 타입별로 파싱
+        if (ranking.includes('National Universities')) {
+          rankingsObject.nationalRanking = extractRankingNumber(ranking);
+        } else if (ranking.includes('Best Value Schools')) {
+          rankingsObject.bestValueSchools = extractRankingNumber(ranking);
+        } else if (ranking.includes('Best Undergraduate Engineering Programs')) {
+          rankingsObject.engineeringPrograms = extractRankingNumber(ranking);
+        } else if (ranking.includes('Computer Science')) {
+          rankingsObject.computerScience = extractRankingNumber(ranking);
+        } else if (ranking.includes('Psychology Programs')) {
+          rankingsObject.psychologyPrograms = extractRankingNumber(ranking);
+        } else if (ranking.includes('Economics')) {
+          rankingsObject.economics = extractRankingNumber(ranking);
+        } else if (ranking.includes('Writing in the Disciplines')) {
+          rankingsObject.writingInDisciplines = extractRankingNumber(ranking);
+        } else if (ranking.includes('Undergraduate Research/Creative Projects')) {
+          rankingsObject.undergraduateResearch = extractRankingNumber(ranking);
+        } else if (ranking.includes('Service Learning')) {
+          rankingsObject.serviceLearning = extractRankingNumber(ranking);
+        } else if (ranking.includes('First-Year Experiences')) {
+          rankingsObject.firstYearExperiences = extractRankingNumber(ranking);
+        } else if (ranking.includes('Senior Capstone')) {
+          rankingsObject.seniorCapstone = extractRankingNumber(ranking);
+        } else if (ranking.includes('Best Colleges for Veterans')) {
+          rankingsObject.collegesForVeterans = extractRankingNumber(ranking);
+        } else if (ranking.includes('Best Undergraduate Teaching')) {
+          rankingsObject.undergraduateTeaching = extractRankingNumber(ranking);
+        } else if (ranking.includes('Most Innovative Schools')) {
+          rankingsObject.innovativeSchools = extractRankingNumber(ranking);
+        } else if (ranking.includes('Top Performers on Social Mobility')) {
+          rankingsObject.socialMobility = extractRankingNumber(ranking);
+        }
+      } catch (error) {
+        // 파싱 실패시 해당 항목은 null로 유지
+      }
+    });
+
+    // 새로운 객체로 바꾸기
+    delete processedData['overallRankings.allRankings'];
+    
+    // overallRankings.allRankings 객체로 변환
+    processedData['overallRankings.allRankings'] = rankingsObject;
+  }
+  
+  return processedData;
+}
+
+// Helper function to extract ranking number from text
+function extractRankingNumber(text: string): number | null {
+  const match = text.match(/#(\d+)/);
+  return match ? parseInt(match[1]) : null;
+}

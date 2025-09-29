@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { config, type ExtractionConfig } from "./config";
-import { extractFromHtml, saveResults } from "./extractor";
+import { extractFromHtml, saveResults, processRankingsData } from "./extractor";
 
 function getPagePrefixFromFilename(filename: string): string {
   const baseName = path.basename(filename, '.html');
@@ -23,13 +23,13 @@ function filterConfigByPage(fullConfig: ExtractionConfig, pagePrefix: string): E
   return filtered;
 }
 
-// -------------------- Main Entry Point --------------------
-function processUniversity(universityName: string): void {
+// -------------------- University Processing --------------------
+function processUniversity(universityName: string): any {
   const universityDir = path.resolve(`./data/html/${universityName}`);
   
   if (!fs.existsSync(universityDir)) {
     console.log(`❌ University directory not found: ${universityName}`);
-    return;
+    return null;
   }
 
   const htmlFiles = fs.readdirSync(universityDir).filter(file => file.endsWith('.html'));
@@ -53,68 +53,57 @@ function processUniversity(universityName: string): void {
     allExtracted = { ...allExtracted, ...extracted };
   }
 
-  saveResults(allExtracted, universityName);
   console.log(`✅ ${universityName} completed`);
+  return allExtracted;
 }
 
-// -------------------- Unified JSON Generation --------------------
-function createUnifiedOutput(): void {
-  console.log('\n🔄 Creating unified JSON output for MongoDB...');
-  
-  const outputDir = path.resolve('./output');
-  const allJsonFiles = fs.readdirSync(outputDir)
-    .filter(file => file.endsWith('.json'))
-    .sort();
-
-  console.log(`📖 Reading ${allJsonFiles.length} university data files...`);
-
-  const unifiedUniversities: any[] = [];
-
-  allJsonFiles.forEach(file => {
-    const filePath = path.join(outputDir, file);
-    const universityName = path.basename(file, '.json').replace(/_/g, ' ');
-    
-    try {
-      const universityData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-      
-      // MongoDB-friendly structure
-      const universityDocument = {
-        _id: universityName,
-        name: universityName,
-        slug: path.basename(file, '.json'),
-        ...universityData
-      };
-      
-      unifiedUniversities.push(universityDocument);
-    } catch (error) {
-      console.error(`❌ Error processing ${file}:`, error);
-    }
-  });
-
-  // Save unified output
-  const unifiedPath = path.resolve('./output-unified.json');
-  fs.writeFileSync(unifiedPath, JSON.stringify(unifiedUniversities, null, 2));
-  
-  console.log(`✅ Unified JSON created: ${unifiedPath}`);
-  console.log(`📊 Total universities: ${unifiedUniversities.length}`);
-  console.log(`💾 Ready for MongoDB import!`);
-}
-
-// Get command line argument or process all universities
-const args = process.argv.slice(2);
-
-if (args.length > 0) {
-  const command = args[0];
-  
-  if (command === 'unified') {
-    // Generate unified JSON only
-    createUnifiedOutput();
-  } else {
-    // Process specific university
-    processUniversity(command);
+// -------------------- Random ID Generation --------------------
+function generateRandomId(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < 12; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-} else {
-  // Process all universities
+  return result;
+}
+
+// -------------------- Single University Processing --------------------
+function processSingleUniversity(universityInput: string): void {
+  console.log(`\n🎯 Processing single university: ${universityInput}`);
+  
+  // Convert university name to directory format
+  const directoryName = universityInput.replace(/ /g, '_');
+  
+  try {
+    const universityData = processUniversity(directoryName);
+    
+    if (universityData) {
+      const universityName = universityInput;
+      const processedData = processRankingsData(universityData);
+      const universityDocument = {
+        _id: generateRandomId(),
+        name: universityName,
+        ...processedData
+      };
+
+      // Create single-item array for consistent format
+      const unifiedUniversities = [universityDocument];
+      
+      // Save unified output
+      const unifiedPath = path.resolve('./output/output-unified.json');
+      fs.writeFileSync(unifiedPath, JSON.stringify(unifiedUniversities, null, 2));
+      
+  console.log(`✅ Single university processed`);
+  console.log(`📝 Unified JSON created: ${unifiedPath}`);
+  console.log(`📊 Total universities: 1`);
+    }
+  } catch (error) {
+    console.log(`❌ ${universityInput} failed: ${error}`);
+  }
+}
+
+// -------------------- All Universities Processing --------------------
+function processAllUniversities(): void {
   const htmlDir = path.resolve("./data/html");
   const universities = fs.readdirSync(htmlDir)
     .filter(item => {
@@ -131,19 +120,35 @@ if (args.length > 0) {
 
   console.log('\nStarting batch processing...\n');
 
+  let unifiedUniversities: any[] = [];
   let successCount = 0;
   let errorCount = 0;
 
   universities.forEach((university, index) => {
     try {
       console.log(`[${index + 1}/${universities.length}] Processing ${university}...`);
-      processUniversity(university);
-      successCount++;
+      const universityData = processUniversity(university);
+      
+      if (universityData) {
+        const universityName = university.replace(/_/g, ' ');
+        const processedData = processRankingsData(universityData);
+        const universityDocument = {
+          _id: generateRandomId(),
+          name: universityName,
+          ...processedData
+        };
+        unifiedUniversities.push(universityDocument);
+        successCount++;
+      }
     } catch (error) {
       console.log(`❌ ${university} failed: ${error}`);
       errorCount++;
     }
   });
+
+  // Save unified output
+  const unifiedPath = path.resolve('./output/output-unified.json');
+  fs.writeFileSync(unifiedPath, JSON.stringify(unifiedUniversities, null, 2));
 
   console.log('\n' + '='.repeat(50));
   console.log('BATCH PROCESSING COMPLETE');
@@ -151,9 +156,18 @@ if (args.length > 0) {
   console.log(`Total universities: ${universities.length}`);
   console.log(`Successful: ${successCount}`);
   console.log(`Failed: ${errorCount}`);
-  
-  // Automatically create unified output after processing all universities
-  if (successCount > 0) {
-    createUnifiedOutput();
-  }
+  console.log(`✅ Unified JSON created: ${unifiedPath}`);
+  console.log(`📊 Total universities: ${unifiedUniversities.length}`);
+}
+
+// -------------------- Main Entry Point --------------------
+const args = process.argv.slice(2);
+
+if (args.length > 0) {
+  // Process specific university
+  const universityName = args[0];
+  processSingleUniversity(universityName);
+} else {
+  // Process all universities
+  processAllUniversities();
 }

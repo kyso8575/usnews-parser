@@ -32,24 +32,11 @@ npm install
 ### Extract University Data
 
 ```bash
-# Extract all universities (creates individual JSON files + unified JSON)
+# Extract all universities (creates unified JSON)
 npm run extract
 
 # Extract specific university
-npm run extract "Harvard_University"
-
-# Generate only unified JSON from existing individual files
-npm run unified
-```
-
-### MongoDB Integration
-
-```bash
-# Generate unified JSON for MongoDB
-npm run unified
-
-# Import to MongoDB (requires MongoDB running locally)
-npm run import-mongo
+npm run extract "Princeton University"
 ```
 
 ### Generate Excel Files
@@ -66,16 +53,16 @@ node create_excel_with_korean.js
 
 ```
 ├── src/                    # TypeScript source files
-│   ├── main.ts            # Main entry point
+│   ├── main.ts            # Main entry point (includes unified JSON generation)
 │   ├── extractor.ts       # Data extraction logic
 │   ├── parser.ts          # HTML parsing utilities
 │   └── config.ts          # Configuration management
 ├── data/                  # Data files
 │   ├── extraction-config.json  # Field definitions with Korean descriptions
 │   └── html/              # Raw HTML files
-├── output/                # Extracted JSON data
-├── dist/                  # Compiled JavaScript
-└── *.js                   # Utility scripts
+├── output/                # All JSON files
+│   └── output-unified.json    # Unified university data
+└── dist/                  # Compiled JavaScript (if building)
 ```
 
 ## Configuration
@@ -88,10 +75,8 @@ The `data/extraction-config.json` file contains:
 
 ## Output
 
-- **Individual JSON Files**: Separate files per university in `output/` directory
-- **Unified JSON**: Single `output-unified.json` file ready for MongoDB import
+- **Unified JSON**: Single `output/output-unified.json` file with all university data
 - **Excel Files**: Comprehensive spreadsheets with examples
-- **MongoDB Import Script**: Automated import script (`import-to-mongo.sh`)
 - **Structured Data**: 450+ fields per university
 
 ## Supported Universities
