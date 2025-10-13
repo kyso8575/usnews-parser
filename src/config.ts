@@ -8,9 +8,11 @@ export interface FieldConfig {
   objectMapping?: Record<string, {
     find: string[];
     getText?: string[];
+    type?: "number" | "string" | "boolean" | "raw" | "array" | "object" | "custom";
   }>;
   flexibleMapping?: boolean;
   customFunction?: string;
+  getItemType?: "number" | "string" | "boolean" | "raw";
 }
 
 export type ExtractionConfig = Record<string, FieldConfig>;

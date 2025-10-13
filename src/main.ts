@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { config, type ExtractionConfig } from "./config";
 import { extractFromHtml, saveResults, processRankingsData } from "./extractor";
+import { validateDataIntegrity, reportDataIntegrity, validateCompleteDataset } from "./validator";
 
 function getPagePrefixFromFilename(filename: string): string {
   const baseName = path.basename(filename, '.html');
@@ -51,6 +52,10 @@ function processUniversity(universityName: string): any {
 
     const extracted = extractFromHtml(htmlContent, pageConfig);
     allExtracted = { ...allExtracted, ...extracted };
+    
+    // 데이터 무결성 검사
+    const integrityErrors = validateDataIntegrity(extracted, pageConfig, htmlFile);
+    reportDataIntegrity(universityName, integrityErrors);
   }
 
   console.log(`✅ ${universityName} completed`);
@@ -158,6 +163,9 @@ function processAllUniversities(): void {
   console.log(`Failed: ${errorCount}`);
   console.log(`✅ Unified JSON created: ${unifiedPath}`);
   console.log(`📊 Total universities: ${unifiedUniversities.length}`);
+  
+  // 전체 데이터셋 무결성 검사
+  validateCompleteDataset(unifiedUniversities);
 }
 
 // -------------------- Main Entry Point --------------------

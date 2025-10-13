@@ -14,29 +14,31 @@ export function parseNumberFromString(input: string): number | null {
 
 export function castValue(rawText: string | null, type: "number" | "string" | "boolean" | "raw" | "array" | "object" | "custom"): unknown {
   if (rawText == null) return null;
-  const normalized = normalizeWhitespace(rawText);
+  
   switch (type) {
     case "number": {
+      const normalized = normalizeWhitespace(rawText);
       return parseNumberFromString(normalized);
     }
     case "boolean": {
+      const normalized = normalizeWhitespace(rawText);
       const v = normalized.toLowerCase();
       if (["true", "yes", "y", "1", "on"].includes(v)) return true;
       if (["false", "no", "n", "0", "off"].includes(v)) return false;
       return null;
     }
     case "string": {
-      return normalized;
+      return normalizeWhitespace(rawText);
     }
     case "array": {
-      // This case is handled differently in extractor
-      return normalized;
+      // Arrays are handled in extractor logic, return null here to indicate empty/nonexistent data
+      return null;
     }
     case "object": {
-      // This case is handled differently in extractor
-      return normalized;
+      // Objects are handled in extractor logic, return null here to indicate empty/nonexistent data
+      return null;
     }
-    case "raw":
+    case "raw": 
     case "custom":
     default:
       return rawText;

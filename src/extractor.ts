@@ -49,34 +49,179 @@ export function extractFromHtml(
   const $ = load(html);
   const result: Record<string, unknown> = {};
   
-  // Cache sports data if any custom sports fields are present
+  // Initialize sports data if needed
   let sportsData: SportsSection | null = null;
+  const needsSportsData = needsSportsExtraction(cfg);
+  if (needsSportsData) {
+    sportsData = extractSportsData(html);
+  }
+  
   for (const [fieldPath, fieldCfg] of Object.entries(cfg)) {
     // Handle custom functions
     if (fieldCfg.type === "custom" && fieldCfg.customFunction) {
-      if (fieldCfg.customFunction === "extractSportsData") {
-        if (!sportsData) {
-          sportsData = extractSportsData(html);
-        }
-        // Match exact field by suffix to avoid substring collisions
-        if (fieldPath.endsWith(".nonscholarshipSports")) {
-          result[fieldPath] = sportsData.nonscholarshipSports;
-        } else if (fieldPath.endsWith(".scholarshipSports")) {
-          result[fieldPath] = sportsData.scholarshipSports;
-        } else if (fieldPath.endsWith(".clubSports")) {
-          result[fieldPath] = sportsData.clubSports;
-        } else if (fieldPath.endsWith(".intramuralRecreationalSports")) {
-          result[fieldPath] = sportsData.intramuralRecreationalSports;
-        }
+      const value = handleCustomSportsFunction(fieldPath, fieldCfg, sportsData);
+      if (value !== null) {
+        result[fieldPath] = value;
       }
       continue;
     }
+    
     const evaluation = evaluateField($, fieldCfg);
 
     if (fieldCfg.type === "array" && evaluation.elements) {
-      // Handle array type - extract text from all elements
+      result[fieldPath] = processArrayField($, fieldCfg, evaluation.elements, fieldPath);
+    } else if (fieldCfg.type === "object" && fieldCfg.objectMapping && evaluation.elements) {
+      result[fieldPath] = processObjectFieldWithElements($, fieldCfg, evaluation.elements, fieldPath);
+    } else if (fieldCfg && fieldCfg.objectMapping) {
+      result[fieldPath] = processObjectFieldWithoutElements($, fieldCfg, fieldPath);
+    } else {
+      // Handle single value
+      const typed = castValue(evaluation.text, fieldCfg.type ?? "string");
+      result[fieldPath] = typed;
+    }
+  }
+  return result;
+}
+
+
+// -------------------- Helper Functions for Sports Data --------------------
+function needsSportsExtraction(cfg: ExtractionConfig): boolean {
+  return Object.values(cfg).some(field => 
+    field.type === "custom" && field.customFunction === "extractSportsData"
+  );
+}
+
+function handleCustomSportsFunction(
+  fieldPath: string, 
+  fieldCfg: FieldConfig, 
+  sportsData: SportsSection | null
+): unknown {
+  if (fieldCfg.customFunction !== "extractSportsData" || !sportsData) {
+    return null;
+  }
+  
+  // Match exact field by suffix to avoid substring collisions
+  if (fieldPath.endsWith(".nonscholarshipSports")) {
+    return sportsData.nonscholarshipSports;
+  } else if (fieldPath.endsWith(".scholarshipSports")) {
+    return sportsData.scholarshipSports;
+  } else if (fieldPath.endsWith(".clubSports")) {
+    return sportsData.clubSports;
+  } else if (fieldPath.endsWith(".intramuralRecreationalSports")) {
+    return sportsData.intramuralRecreationalSports;
+  }
+  
+  return null;
+}
+
+export function saveResults(data: Record<string, unknown>, filename: string): void {
+  const outputPath = path.resolve("./output", `${filename}.json`);
+  fs.writeFileSync(outputPath, JSON.stringify(data, null, 2));
+  console.log(`Results saved to: ${outputPath}`);
+}
+
+// -------------------- Ranking Data Custom Processing --------------------
+export function processRankingsData(universityData: any): any {
+  // 안전하게 복사
+  const processedData = { ...universityData };
+  
+  if (processedData['overallRankings.allRankings'] && Array.isArray(processedData['overallRankings.allRankings'])) {
+    const rankings = processedData['overallRankings.allRankings'];
+    const rankingsObject: any = {};
+
+    rankings.forEach((ranking: string) => {
+      try {
+        // 유연한 키 생성: 문자열을 URL-friendly 키로 변환
+        const key = generateFlexibleKey(ranking);
+        const rankValue = extractRankingNumber(ranking);
+        
+        if (key && rankValue !== null) {
+          rankingsObject[key] = rankValue;
+        }
+      } catch (error) {
+        // 파싱 실패시 해당 항목은 건너뛰기
+        console.log(`Failed to process ranking: ${ranking}`);
+      }
+    });
+
+    // 새로운 객체로 바꾸기
+    delete processedData['overallRankings.allRankings'];
+    
+    // overallRankings.allRankings 객체로 변환
+    processedData['overallRankings.allRankings'] = rankingsObject;
+  }
+  
+  return processedData;
+}
+
+// Helper function to extract ranking number from text
+function extractRankingNumber(text: string): number | null {
+  const match = text.match(/#(\d+)/);
+  return match ? parseInt(match[1]) : null;
+}
+
+// Helper function to generate flexible key from ranking text
+function generateFlexibleKey(ranking: string): string | null {
+  try {
+    // 예시:
+    // "#13 in National Universities (tie)" -> "nationalUniversities"
+    // "#15 in Best Value Schools" -> "bestValueSchools"
+    // "#1 in Writing in the Disciplines" -> "writingInTheDisciplines"
+    
+    // "#X in " 패턴을 찾아서 제거
+    const match = ranking.match(/^#?\d+\s+in\s+/i);
+    if (!match) return null;
+    
+    // 매칭된 부분을 제거
+    let cleanText = ranking.substring(match[0].length);
+    
+    // "(tie)" 같은 괄호 내용 제거
+    cleanText = cleanText.replace(/\s*\([^)]*\)$/, '');
+    
+    // 불필요한 단어들 필터링 (잘못된 문자열들 제거)
+    if (cleanText.includes('g ') || cleanText.trim().length < 2) return null;
+    
+    // 특수문자 제거하고 공백 정규화
+    cleanText = cleanText.replace(/[^\w\s]/g, ' ')
+                         .replace(/\s+/g, ' ')
+                         .trim();
+    
+    // 공백 기준으로 단어 분리
+    const words = cleanText.split(' ').filter(word => 
+      word.length > 1 && // 한 글자 단어 제외
+      !word.match(/^[0-9]+$/) && // 숫자만 있는 단어 제외
+      !word.toLowerCase().match(/^(the|a|an|and|or|of|in|on|at|to|for|with)$/) // 불용어 제외
+    );
+    
+    if (words.length === 0) return null;
+    
+    // CamelCase 생성
+    const result = words.map((word, index) => {
+      const cleanWord = word.toLowerCase();
+      return index === 0 ? cleanWord : cleanWord.charAt(0).toUpperCase() + cleanWord.slice(1);
+    }).join('');
+    
+    // 결과 검증
+    if (result.length < 2 || result.length > 50) return null;
+    
+    return result;
+    
+  } catch (error) {
+    console.log(`Error processing ranking text: ${ranking}`, error);
+    return null;
+  }
+}
+
+// -------------------- Extract From Html Helper Functions --------------------
+function processArrayField(
+  $: CheerioAPI,
+  fieldCfg: FieldConfig,
+  elements: Cheerio<AnyNode>,
+  fieldPath: string
+): unknown[] {
       const texts: string[] = [];
-      evaluation.elements.each((_, el) => {
+  
+  elements.each((_, el) => {
         let elementText: string;
         if (fieldCfg.getText && fieldCfg.getText.length > 0) {
           const inner = applySteps($, ($ as unknown as CheerioAPI)(el), fieldCfg.getText);
@@ -93,46 +238,35 @@ export function extractFromHtml(
         }
       });
       
-      // Special handling for Greek Life data - split text and percentage
+  // Special handling for specific field types
       if (fieldPath.includes('greekLife') && fieldPath.includes('undergraduate')) {
-        const splitTexts: string[] = [];
-        texts.forEach(text => {
-          // Split text like "Independent100%" into "Independent" and "100%"
-          const match = text.match(/^([A-Za-z\s]+)(\d+%)$/);
-          if (match) {
-            splitTexts.push(match[1].trim());
-            splitTexts.push(match[2]);
-          } else {
-            splitTexts.push(text);
-          }
-        });
-        result[fieldPath] = splitTexts;
-      } else if (fieldPath.includes('studentParticipationInSpecialStudyOptions') || fieldPath.includes('studentParticipationInSpecialAcademicPrograms')) {
-        // Remove percentage-only entries from student participation data
-        const filteredTexts = texts.filter(text => {
-          // Keep only entries that are not just percentages
-          return !/^\d+%$/.test(text.trim());
-        });
-        result[fieldPath] = filteredTexts;
-      } else {
-        result[fieldPath] = texts;
-      }
-    } else if (fieldCfg.type === "object" && fieldCfg.objectMapping && evaluation.elements) {
-      // Handle object type - extract multiple fields into an object
+    return splitGreekLifeText(texts);
+  } else if (fieldPath.includes('studentParticipationInSpecialStudyOptions') || fieldPath.includes('studentParticipationInSpecialAcademicPrograms')) {
+    return filterPercentageOnlyEntries(texts);
+  }
+  
+  return texts;
+}
+
+function processObjectFieldWithElements(
+  $: CheerioAPI,
+  fieldCfg: FieldConfig,
+  elements: Cheerio<AnyNode>,
+  fieldPath: string
+): Record<string, unknown> {
       const obj: Record<string, unknown> = {};
       
-      for (const [key, mapping] of Object.entries(fieldCfg.objectMapping)) {
+  for (const [key, mapping] of Object.entries(fieldCfg.objectMapping || {})) {
         // Find elements that match the mapping criteria
-        const matchingElements = evaluation.elements.filter((_, el) => {
+    const matchingElements = elements.filter((_, el) => {
           const $el = ($ as unknown as CheerioAPI)(el);
-          // Check if element contains the required text
-          return mapping.find.every(step => {
+      return mapping.find?.every(step => {
             if (step.startsWith('haveText:')) {
               const text = step.substring(9);
               return $el.text().includes(text);
             }
             return true;
-          });
+      }) ?? false;
         });
         
         if (matchingElements.length > 0) {
@@ -151,41 +285,85 @@ export function extractFromHtml(
           }
           
             if (text) {
-              // Clean up faculty data and coerce numbers where applicable
+        obj[key] = cleanTextValue(fieldPath, key, text);
+      }
+    }
+  }
+  
+  return obj;
+}
+
+function processObjectFieldWithoutElements(
+  $: CheerioAPI,
+  fieldCfg: FieldConfig,
+  fieldPath: string
+): Record<string, unknown> {
+  // Get the base elements from the main find steps
+  const baseElements = applySteps($, $.root() as unknown as Cheerio<AnyNode>, fieldCfg.find || []);
+  
+  // Check if this is a flexible mapping (no specific keys defined)
+  if (fieldCfg.flexibleMapping) {
+    return extractFlexibleKeyValuePairs($, baseElements);
+  } else {
+    return processPredefinedMappings($, fieldCfg.objectMapping!, baseElements, fieldPath);
+  }
+}
+
+// -------------------- Array Processing Helper Functions --------------------
+function splitGreekLifeText(texts: string[]): string[] {
+  const splitTexts: string[] = [];
+  texts.forEach(text => {
+    // Split text like "Independent100%" into "Independent" and "100%"
+    const match = text.match(/^([A-Za-z\s]+)(\d+%)$/);
+    if (match) {
+      splitTexts.push(match[1].trim());
+      splitTexts.push(match[2]);
+    } else {
+      splitTexts.push(text);
+    }
+  });
+  return splitTexts;
+}
+
+function filterPercentageOnlyEntries(texts: string[]): string[] {
+  // Remove percentage-only entries from student participation data
+  return texts.filter(text => {
+    // Keep only entries that are not just percentages
+    return !/^\d+%$/.test(text.trim());
+  });
+}
+
+// -------------------- Object Processing Helper Functions --------------------
+function cleanTextValue(fieldPath: string, key: string, text: string): unknown {
               let cleanedText = normalizeWhitespace(text);
+  
               if (fieldPath.includes('facultyAndClasses') && (key === 'full_time' || key === 'part_time')) {
                 // Remove trailing labels like "full time" or "part time"
                 cleanedText = cleanedText.replace(/\s+(full time|part time)$/i, '');
               }
+  
               if (fieldPath.includes('totalFaculty') && (key === 'full_time' || key === 'part_time')) {
                 const numeric = parseNumberFromString(cleanedText);
-                obj[key] = numeric ?? cleanedText;
+    return numeric ?? cleanedText;
               } else if (fieldPath.includes('GenderDistribution') || fieldPath.includes('EthnicDiversity') || fieldPath.includes('classSizes') || fieldPath.includes('studentDemographics') || fieldPath.includes('greekLife')) {
                 // Extract percentage from text like "Male60.7%" -> "60.7%"
                 const percentageMatch = cleanedText.match(/(\d+\.?\d*%)/);
-                obj[key] = percentageMatch ? percentageMatch[1] : cleanedText;
+    return percentageMatch ? percentageMatch[1] : cleanedText;
               } else if (fieldPath.includes('studentsRequiredToLiveInSchoolHousing')) {
                 // Extract Yes/No from text like "First-year StudentsYes" -> "Yes"
                 const yesNoMatch = cleanedText.match(/(Yes|No)$/);
-                obj[key] = yesNoMatch ? yesNoMatch[1] : cleanedText;
-              } else {
-                obj[key] = cleanedText;
-              }
-            }
-        }
-      }
-      
-      result[fieldPath] = obj;
-    } else if (fieldCfg.type === "object" && fieldCfg.objectMapping) {
-      // Handle object type when no elements found - try to extract from the found elements
+    return yesNoMatch ? yesNoMatch[1] : cleanedText;
+  }
+  
+  return cleanedText;
+}
+
+function extractFlexibleKeyValuePairs(
+  $: CheerioAPI,
+  baseElements: Cheerio<AnyNode>
+): Record<string, unknown> {
       const obj: Record<string, unknown> = {};
       
-      // Get the base elements from the main find steps
-      const baseElements = applySteps($, $.root() as unknown as Cheerio<AnyNode>, fieldCfg.find || []);
-      
-      // Check if this is a flexible mapping (no specific keys defined)
-      if (fieldCfg.flexibleMapping) {
-        // Extract all key-value pairs dynamically from list items
         for (let i = 0; i < baseElements.length; i++) {
           const $el = ($ as unknown as CheerioAPI)(baseElements.get(i));
           
@@ -208,20 +386,29 @@ export function extractFromHtml(
             }
           }
         }
-      } else {
-        // Use predefined mapping
-        for (const [key, mapping] of Object.entries(fieldCfg.objectMapping)) {
+  
+  return obj;
+}
+
+function processPredefinedMappings(
+  $: CheerioAPI,
+  objectMapping: Record<string, FieldConfig>,
+  baseElements: Cheerio<AnyNode>,
+  fieldPath: string
+): Record<string, unknown> {
+  const obj: Record<string, unknown> = {};
+  
+  for (const [key, mapping] of Object.entries(objectMapping)) {
           // Find elements that match the mapping criteria within base elements
           const matchingElements = baseElements.filter((_, el) => {
             const $el = ($ as unknown as CheerioAPI)(el);
-            // Check if element contains the required text
-            return mapping.find.every(step => {
+      return mapping.find?.every(step => {
               if (step.startsWith('haveText:')) {
                 const text = step.substring(9);
                 return $el.text().includes(text);
               }
               return true;
-            });
+      }) ?? false;
           });
           
           if (matchingElements.length > 0) {
@@ -240,122 +427,10 @@ export function extractFromHtml(
             }
             
             if (text) {
-              // Clean up faculty data - remove labels and coerce numbers when appropriate
-              let cleanedText = normalizeWhitespace(text);
-              if (fieldPath.includes('facultyAndClasses') && (key === 'full_time' || key === 'part_time')) {
-                cleanedText = cleanedText.replace(/\s+(full time|part time)$/i, '');
-              }
-              if (fieldPath.includes('totalFaculty') && (key === 'full_time' || key === 'part_time')) {
-                const numeric = parseNumberFromString(cleanedText);
-                obj[key] = numeric ?? cleanedText;
-              } else if (fieldPath.includes('GenderDistribution') || fieldPath.includes('EthnicDiversity') || fieldPath.includes('classSizes') || fieldPath.includes('studentDemographics') || fieldPath.includes('greekLife')) {
-                // Extract percentage from text like "Male60.7%" -> "60.7%"
-                const percentageMatch = cleanedText.match(/(\d+\.?\d*%)/);
-                obj[key] = percentageMatch ? percentageMatch[1] : cleanedText;
-              } else if (fieldPath.includes('studentsRequiredToLiveInSchoolHousing')) {
-                // Extract Yes/No from text like "First-year StudentsYes" -> "Yes"
-                const yesNoMatch = cleanedText.match(/(Yes|No)$/);
-                obj[key] = yesNoMatch ? yesNoMatch[1] : cleanedText;
-              } else {
-                obj[key] = cleanedText;
-              }
-            }
-          }
-        }
+        obj[key] = cleanTextValue(fieldPath, key, text);
       }
-      
-      result[fieldPath] = obj;
-    } else {
-      // Handle single value
-      const typed = castValue(evaluation.text, fieldCfg.type ?? "string");
-      result[fieldPath] = typed;
     }
   }
-  return result;
-}
-
-export function saveResults(data: Record<string, unknown>, filename: string): void {
-  const outputPath = path.resolve("./output", `${filename}.json`);
-  fs.writeFileSync(outputPath, JSON.stringify(data, null, 2));
-  console.log(`Results saved to: ${outputPath}`);
-}
-
-// -------------------- Ranking Data Custom Processing --------------------
-export function processRankingsData(universityData: any): any {
-  // 안전하게 복사
-  const processedData = { ...universityData };
   
-  if (processedData['overallRankings.allRankings'] && Array.isArray(processedData['overallRankings.allRankings'])) {
-    const rankings = processedData['overallRankings.allRankings'];
-    const rankingsObject: any = {
-      nationalRanking: null,
-      bestValueSchools: null,
-      engineeringPrograms: null,
-      computerScience: null,
-      psychologyPrograms: null,
-      economics: null,
-      writingInDisciplines: null,
-      undergraduateResearch: null,
-      serviceLearning: null,
-      firstYearExperiences: null,
-      seniorCapstone: null,
-      collegesForVeterans: null,
-      undergraduateTeaching: null,
-      innovativeSchools: null,
-      socialMobility: null
-    };
-
-    rankings.forEach((ranking: string) => {
-      try {
-        // Ranking 타입별로 파싱
-        if (ranking.includes('National Universities')) {
-          rankingsObject.nationalRanking = extractRankingNumber(ranking);
-        } else if (ranking.includes('Best Value Schools')) {
-          rankingsObject.bestValueSchools = extractRankingNumber(ranking);
-        } else if (ranking.includes('Best Undergraduate Engineering Programs')) {
-          rankingsObject.engineeringPrograms = extractRankingNumber(ranking);
-        } else if (ranking.includes('Computer Science')) {
-          rankingsObject.computerScience = extractRankingNumber(ranking);
-        } else if (ranking.includes('Psychology Programs')) {
-          rankingsObject.psychologyPrograms = extractRankingNumber(ranking);
-        } else if (ranking.includes('Economics')) {
-          rankingsObject.economics = extractRankingNumber(ranking);
-        } else if (ranking.includes('Writing in the Disciplines')) {
-          rankingsObject.writingInDisciplines = extractRankingNumber(ranking);
-        } else if (ranking.includes('Undergraduate Research/Creative Projects')) {
-          rankingsObject.undergraduateResearch = extractRankingNumber(ranking);
-        } else if (ranking.includes('Service Learning')) {
-          rankingsObject.serviceLearning = extractRankingNumber(ranking);
-        } else if (ranking.includes('First-Year Experiences')) {
-          rankingsObject.firstYearExperiences = extractRankingNumber(ranking);
-        } else if (ranking.includes('Senior Capstone')) {
-          rankingsObject.seniorCapstone = extractRankingNumber(ranking);
-        } else if (ranking.includes('Best Colleges for Veterans')) {
-          rankingsObject.collegesForVeterans = extractRankingNumber(ranking);
-        } else if (ranking.includes('Best Undergraduate Teaching')) {
-          rankingsObject.undergraduateTeaching = extractRankingNumber(ranking);
-        } else if (ranking.includes('Most Innovative Schools')) {
-          rankingsObject.innovativeSchools = extractRankingNumber(ranking);
-        } else if (ranking.includes('Top Performers on Social Mobility')) {
-          rankingsObject.socialMobility = extractRankingNumber(ranking);
-        }
-      } catch (error) {
-        // 파싱 실패시 해당 항목은 null로 유지
-      }
-    });
-
-    // 새로운 객체로 바꾸기
-    delete processedData['overallRankings.allRankings'];
-    
-    // overallRankings.allRankings 객체로 변환
-    processedData['overallRankings.allRankings'] = rankingsObject;
-  }
-  
-  return processedData;
-}
-
-// Helper function to extract ranking number from text
-function extractRankingNumber(text: string): number | null {
-  const match = text.match(/#(\d+)/);
-  return match ? parseInt(match[1]) : null;
+  return obj;
 }
