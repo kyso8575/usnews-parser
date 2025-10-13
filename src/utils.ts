@@ -12,6 +12,31 @@ export function parseNumberFromString(input: string): number | null {
   return Number.isNaN(num) ? null : num;
 }
 
+export function parseSAT1600Scale(rawText: string): Record<string, number> | null {
+  if (!rawText || rawText === "N/A") return null;
+  
+  // Remove the "SATs on 1600 scale" prefix if present
+  const cleanText = rawText.replace(/^SATs on 1600 scale/i, '').trim();
+  
+  // Pattern to match score ranges and percentages
+  // Matches patterns like "1400-160097%" or "1200-13992%"
+  const pattern = /(\d{3,4}-\d{3,4})(\d+(?:\.\d+)?%)/g;
+  const result: Record<string, number> = {};
+  
+  let match;
+  while ((match = pattern.exec(cleanText)) !== null) {
+    const scoreRange = match[1];
+    const percentageStr = match[2].replace('%', '');
+    const percentage = parseFloat(percentageStr);
+    
+    if (!isNaN(percentage)) {
+      result[scoreRange] = percentage;
+    }
+  }
+  
+  return Object.keys(result).length > 0 ? result : null;
+}
+
 export function castValue(rawText: string | null, type: "number" | "string" | "boolean" | "raw" | "array" | "object" | "custom"): unknown {
   if (rawText == null) return null;
   

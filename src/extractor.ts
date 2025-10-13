@@ -3,7 +3,7 @@ import * as path from "path";
 import { load, Cheerio, CheerioAPI } from "cheerio";
 import type { AnyNode } from "domhandler";
 import { type FieldConfig, type ExtractionConfig } from "./config";
-import { castValue, normalizeWhitespace, parseNumberFromString } from "./utils";
+import { castValue, normalizeWhitespace, parseNumberFromString, parseSAT1600Scale } from "./utils";
 import { applySteps } from "./parser";
 import { extractSportsData, type SportsSection } from "./sportsExtractor";
 
@@ -59,7 +59,19 @@ export function extractFromHtml(
   for (const [fieldPath, fieldCfg] of Object.entries(cfg)) {
     // Handle custom functions
     if (fieldCfg.type === "custom" && fieldCfg.customFunction) {
-      const value = handleCustomSportsFunction(fieldPath, fieldCfg, sportsData);
+      let value = null;
+      
+      // Handle SAT 1600 scale parsing
+      if (fieldCfg.customFunction === "parseSAT1600Scale") {
+        const evaluation = evaluateField($, fieldCfg);
+        if (evaluation.text) {
+          value = parseSAT1600Scale(evaluation.text);
+        }
+      } else {
+        // Handle sports data functions
+        value = handleCustomSportsFunction(fieldPath, fieldCfg, sportsData);
+      }
+      
       if (value !== null) {
         result[fieldPath] = value;
       }

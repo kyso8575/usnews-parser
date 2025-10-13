@@ -1886,9 +1886,10 @@
     "getText": [
       "get:p:last-child"
     ],
-    "type": "string",
-    "description": "SAT scores reported on 1600 scale",
-    "korean_description": "1600점 만점으로 보고된 SAT 점수"
+    "type": "custom",
+    "customFunction": "parseSAT1600Scale",
+    "description": "SAT scores reported on 1600 scale as object with score ranges and percentages",
+    "korean_description": "1600점 만점으로 보고된 SAT 점수 (점수 범위별 비율 객체)"
   },
   "applying.satScores.medianSAT": {
     "find": [
