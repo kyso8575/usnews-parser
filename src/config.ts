@@ -5,6 +5,8 @@ export interface FieldConfig {
   find?: string[];
   getText?: string[];
   type?: "number" | "string" | "boolean" | "raw" | "array" | "object" | "custom";
+  // When provided, extract the given attribute from the matched element instead of text
+  attribute?: string;
   objectMapping?: Record<string, {
     find: string[];
     getText?: string[];

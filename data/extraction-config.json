@@ -1215,18 +1215,6 @@
     "description": "Maximum length of time admission can be deferred",
     "korean_description": "입학 연기 가능 기간"
   },
-  "applying.applicationFormats.applicationUrl": {
-    "find": [
-      "get:div.Box-w0dun1-0.DataRow__Row-sc-1udybh3-0.egPJfu.fPkWrz",
-      "haveText:Application URL"
-    ],
-    "getText": [
-      "get:p:last-child"
-    ],
-    "type": "string",
-    "description": "URL for online application",
-    "korean_description": "온라인 지원서 URL"
-  },
   "applying.applicationFormats.commonApplicationAccepted": {
     "find": [
       "get:div.Box-w0dun1-0.DataRow__Row-sc-1udybh3-0.egPJfu.fPkWrz",
@@ -6569,5 +6557,23 @@
     "customFunction": "extractSportsData",
     "description": "Intramural/recreational sports list",
     "korean_description": "교내/레크리에이션 스포츠 목록"
+  },
+  "applying.websiteUrl": {
+    "find": [
+      "get:script[type='application/ld+json']"
+    ],
+    "type": "custom",
+    "customFunction": "extractWebsiteUrlFromJsonLd",
+    "description": "University's official website URL extracted from JSON-LD schema",
+    "korean_description": "JSON-LD 스키마에서 추출한 대학교 공식 웹사이트 URL"
+  },
+  "applying.applicationFormats.applicationUrl": {
+    "find": [
+      "get:a[data-test-id='application_url']"
+    ],
+    "type": "attribute",
+    "attribute": "href",
+    "description": "Application URL for university applications",
+    "korean_description": "대학교 지원을 위한 애플리케이션 URL"
   }
 }

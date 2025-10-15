@@ -67,6 +67,9 @@ export function extractFromHtml(
         if (evaluation.text) {
           value = parseSAT1600Scale(evaluation.text);
         }
+      } else if (fieldCfg.customFunction === "extractWebsiteUrlFromJsonLd") {
+        // Handle website URL extraction from JSON-LD
+        value = extractWebsiteUrlFromJsonLd($);
       } else {
         // Handle sports data functions
         value = handleCustomSportsFunction(fieldPath, fieldCfg, sportsData);
@@ -88,7 +91,10 @@ export function extractFromHtml(
       result[fieldPath] = processObjectFieldWithoutElements($, fieldCfg, fieldPath);
     } else {
       // Handle single value
-      const typed = castValue(evaluation.text, fieldCfg.type ?? "string");
+      const valueText = fieldCfg.attribute && evaluation.element
+        ? evaluation.element.attr(fieldCfg.attribute) ?? null
+        : evaluation.text;
+      const typed = castValue(valueText, fieldCfg.type ?? "string");
       result[fieldPath] = typed;
     }
   }
@@ -101,6 +107,47 @@ function needsSportsExtraction(cfg: ExtractionConfig): boolean {
   return Object.values(cfg).some(field => 
     field.type === "custom" && field.customFunction === "extractSportsData"
   );
+}
+
+// -------------------- Helper Function for Website URL Extraction --------------------
+function extractWebsiteUrlFromJsonLd($: CheerioAPI): string | null {
+  try {
+    // Find JSON-LD script tag
+    const jsonLdScript = $('script[type="application/ld+json"]').first();
+    if (jsonLdScript.length === 0) {
+      return null;
+    }
+
+    const jsonText = jsonLdScript.html();
+    if (!jsonText) {
+      return null;
+    }
+
+    // Parse JSON-LD
+    const jsonData = JSON.parse(jsonText);
+    
+    // Extract URL from the JSON-LD schema
+    if (jsonData && typeof jsonData === 'object') {
+      // Check if it's an EducationalOrganization with url property
+      if (jsonData['@type'] === 'EducationalOrganization' && jsonData.url) {
+        return jsonData.url;
+      }
+      
+      // Also check for nested objects or arrays
+      if (Array.isArray(jsonData)) {
+        for (const item of jsonData) {
+          if (item && typeof item === 'object' && item['@type'] === 'EducationalOrganization' && item.url) {
+            return item.url;
+          }
+        }
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.log('Error extracting website URL from JSON-LD:', error);
+    return null;
+  }
 }
 
 function handleCustomSportsFunction(
