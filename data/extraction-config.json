@@ -6558,7 +6558,7 @@
     "description": "Intramural/recreational sports list",
     "korean_description": "교내/레크리에이션 스포츠 목록"
   },
-  "applying.websiteUrl": {
+  "applying.contactInformation.websiteUrl": {
     "find": [
       "get:script[type='application/ld+json']"
     ],

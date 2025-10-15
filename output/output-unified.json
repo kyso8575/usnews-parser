@@ -1,6 +1,6 @@
 [
   {
-    "_id": "ROUD86XrkURs",
+    "_id": "HuW8bGfe2Imk",
     "name": "Brown University",
     "academics.tenMostPopularMajors": {
       "socialsciences": "25%",
@@ -499,7 +499,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Admissions website translated into languages other than English",
-    "applying.websiteUrl": "https://www.brown.edu",
+    "applying.contactInformation.websiteUrl": "https://www.brown.edu",
     "applying.applicationFormats.applicationUrl": "https://www.commonapp.org",
     "campusInfo.campusSizeAcres": "146",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -921,7 +921,7 @@
     }
   },
   {
-    "_id": "e4oasB0s0mKn",
+    "_id": "mxIhuFp82F0j",
     "name": "California Institute of Technology",
     "academics.tenMostPopularMajors": {
       "computerscience": "40%",
@@ -1322,7 +1322,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "No",
-    "applying.websiteUrl": "https://www.caltech.edu",
+    "applying.contactInformation.websiteUrl": "https://www.caltech.edu",
     "applying.applicationFormats.applicationUrl": "https://www.admissions.caltech.edu/apply",
     "campusInfo.campusSizeAcres": "124",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -1686,7 +1686,7 @@
     }
   },
   {
-    "_id": "bfgVB4RxXqHJ",
+    "_id": "qa6WH4ZbqTiR",
     "name": "Columbia University",
     "academics.tenMostPopularMajors": {},
     "academics.highestAlumniSalariesByMajor": {
@@ -2215,7 +2215,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "N/A",
-    "applying.websiteUrl": "http://www.columbia.edu",
+    "applying.contactInformation.websiteUrl": "http://www.columbia.edu",
     "applying.applicationFormats.applicationUrl": "http://undergrad.admissions.columbia.edu",
     "campusInfo.campusSizeAcres": "36",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -2597,7 +2597,7 @@
     }
   },
   {
-    "_id": "Ou77MiQ5t5vZ",
+    "_id": "jS3xLIZCZUzZ",
     "name": "Cornell University",
     "academics.tenMostPopularMajors": {
       "computerandinformationsciencesandsupportservices": "18%",
@@ -3124,7 +3124,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Admissions website translated into languages other than English",
-    "applying.websiteUrl": "http://www.cornell.edu",
+    "applying.contactInformation.websiteUrl": "http://www.cornell.edu",
     "applying.applicationFormats.applicationUrl": "http://admissions.cornell.edu/apply",
     "campusInfo.campusSizeAcres": "745",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -3558,7 +3558,7 @@
     }
   },
   {
-    "_id": "Svld35qd7Z9g",
+    "_id": "NHK41V4lndiS",
     "name": "Dartmouth College",
     "academics.tenMostPopularMajors": {
       "socialsciences": "29%",
@@ -4109,7 +4109,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Admissions website translated into languages other than English",
-    "applying.websiteUrl": "http://www.dartmouth.edu",
+    "applying.contactInformation.websiteUrl": "http://www.dartmouth.edu",
     "applying.applicationFormats.applicationUrl": "http://admissions.dartmouth.edu/",
     "campusInfo.campusSizeAcres": "237",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -4532,7 +4532,7 @@
     }
   },
   {
-    "_id": "obCSneZHiuNr",
+    "_id": "NL3ogymMbrbe",
     "name": "Duke University",
     "academics.tenMostPopularMajors": {},
     "academics.highestAlumniSalariesByMajor": {
@@ -4964,7 +4964,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "N/A",
-    "applying.websiteUrl": "http://www.duke.edu/",
+    "applying.contactInformation.websiteUrl": "http://www.duke.edu/",
     "applying.applicationFormats.applicationUrl": "http://www.admissions.duke.edu/jump/applying/apply.asp",
     "campusInfo.campusSizeAcres": "8,693",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -5375,7 +5375,7 @@
     }
   },
   {
-    "_id": "HHmPCOehipiy",
+    "_id": "dLP0SqmvBz7R",
     "name": "Harvard University",
     "academics.tenMostPopularMajors": {
       "socialsciences": "27%",
@@ -5773,7 +5773,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Admissions website translated into languages other than English",
-    "applying.websiteUrl": "http://www.harvard.edu",
+    "applying.contactInformation.websiteUrl": "http://www.harvard.edu",
     "applying.applicationFormats.applicationUrl": null,
     "campusInfo.campusSizeAcres": "5,603",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -6211,7 +6211,7 @@
     }
   },
   {
-    "_id": "FvYH7C7tHNXT",
+    "_id": "L5ZwhBOHM4Vm",
     "name": "Johns Hopkins University",
     "academics.tenMostPopularMajors": {
       "cellcellularandmolecularbiology": "14%",
@@ -6772,7 +6772,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Admissions website translated into languages other than English",
-    "applying.websiteUrl": "http://www.jhu.edu",
+    "applying.contactInformation.websiteUrl": "http://www.jhu.edu",
     "applying.applicationFormats.applicationUrl": "http://apply.jhu.edu",
     "campusInfo.campusSizeAcres": "140",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -7174,7 +7174,7 @@
     }
   },
   {
-    "_id": "Aq6i1mVXU8WM",
+    "_id": "xIVnHgsMx80v",
     "name": "Massachusetts Institute of Technology",
     "academics.tenMostPopularMajors": {
       "computerscience": "26%",
@@ -7658,7 +7658,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "No",
-    "applying.websiteUrl": "http://web.mit.edu/",
+    "applying.contactInformation.websiteUrl": "http://web.mit.edu/",
     "applying.applicationFormats.applicationUrl": "http://mitadmissions.org/",
     "campusInfo.campusSizeAcres": "168",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -8089,7 +8089,7 @@
     }
   },
   {
-    "_id": "PHEmvjfWEHUy",
+    "_id": "7lYvK0lKEQI4",
     "name": "Northwestern University",
     "academics.tenMostPopularMajors": {},
     "academics.highestAlumniSalariesByMajor": {
@@ -8694,7 +8694,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Admissions website translated into languages other than English",
-    "applying.websiteUrl": "http://www.northwestern.edu",
+    "applying.contactInformation.websiteUrl": "http://www.northwestern.edu",
     "applying.applicationFormats.applicationUrl": "http://admissions.northwestern.edu/apply/index.html",
     "campusInfo.campusSizeAcres": "231",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -9129,7 +9129,7 @@
     }
   },
   {
-    "_id": "8KbViYtAN6Pp",
+    "_id": "JfiNrVtrTx0P",
     "name": "Princeton University",
     "academics.tenMostPopularMajors": {
       "socialsciences": "20%",
@@ -10033,7 +10033,7 @@
     }
   },
   {
-    "_id": "ebXo2y7lzi1W",
+    "_id": "D3099mm9mywv",
     "name": "Rice University",
     "academics.tenMostPopularMajors": {
       "computerandinformationsciencesgeneral": "13%",
@@ -10577,7 +10577,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "No",
-    "applying.websiteUrl": "http://www.rice.edu",
+    "applying.contactInformation.websiteUrl": "http://www.rice.edu",
     "applying.applicationFormats.applicationUrl": "//www.commonapp.org/explore/rice-university;  www.questbridge.org/college-partners/rice-university/application_requirements",
     "campusInfo.campusSizeAcres": "300",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -11000,7 +11000,7 @@
     }
   },
   {
-    "_id": "hS0k5VXVYhRk",
+    "_id": "CkNtONJ7w3Hr",
     "name": "Stanford University",
     "academics.tenMostPopularMajors": {
       "computerandinformationsciencesandsupportservices": "18%",
@@ -11520,7 +11520,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "No",
-    "applying.websiteUrl": "http://www.stanford.edu",
+    "applying.contactInformation.websiteUrl": "http://www.stanford.edu",
     "applying.applicationFormats.applicationUrl": "https://admission.stanford.edu/",
     "campusInfo.campusSizeAcres": "8,180",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -11977,7 +11977,7 @@
     }
   },
   {
-    "_id": "KO6VFmp65FiA",
+    "_id": "hXPik96UeV5V",
     "name": "University of California--Los Angeles",
     "academics.tenMostPopularMajors": {
       "socialsciences": "25%",
@@ -12534,7 +12534,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "No",
-    "applying.websiteUrl": "http://www.ucla.edu/",
+    "applying.contactInformation.websiteUrl": "http://www.ucla.edu/",
     "applying.applicationFormats.applicationUrl": "http://www.universityofcalifornia.edu/admissions/undergrad_adm/apply_to_uc.html",
     "campusInfo.campusSizeAcres": "419",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "N/A",
@@ -12999,7 +12999,7 @@
     }
   },
   {
-    "_id": "4HzV7e80Cd3o",
+    "_id": "xakMrguXc8f1",
     "name": "University of California Berkeley",
     "academics.tenMostPopularMajors": {
       "computerandinformationsciencesandsupportservices": "17%",
@@ -13477,7 +13477,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Yes",
-    "applying.websiteUrl": "https://www.berkeley.edu",
+    "applying.contactInformation.websiteUrl": "https://www.berkeley.edu",
     "applying.applicationFormats.applicationUrl": "https://admission.universityofcalifornia.edu/",
     "campusInfo.campusSizeAcres": "1,232",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "N/A",
@@ -13852,7 +13852,7 @@
     }
   },
   {
-    "_id": "RIXkHQC6tYCJ",
+    "_id": "NDtIbyKj76ul",
     "name": "University of Chicago",
     "academics.tenMostPopularMajors": {},
     "academics.highestAlumniSalariesByMajor": {
@@ -14350,7 +14350,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Admissions website translated into languages other than English",
-    "applying.websiteUrl": "http://www.uchicago.edu",
+    "applying.contactInformation.websiteUrl": "http://www.uchicago.edu",
     "applying.applicationFormats.applicationUrl": "https://collegeadmissions.uchicago.edu/apply",
     "campusInfo.campusSizeAcres": "217",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -14742,7 +14742,7 @@
     }
   },
   {
-    "_id": "NBvJ7RDJR41j",
+    "_id": "mz3bGFAmKdkB",
     "name": "University of Notre Dame",
     "academics.tenMostPopularMajors": {
       "financegeneral": "10%",
@@ -15239,7 +15239,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Admissions website translated into languages other than English",
-    "applying.websiteUrl": "http://www.nd.edu",
+    "applying.contactInformation.websiteUrl": "http://www.nd.edu",
     "applying.applicationFormats.applicationUrl": "https://www.commonapp.org;    http://www.coalitionforcollegeaccess.org;   https://www.questbridge.org",
     "campusInfo.campusSizeAcres": "1,265",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -15702,7 +15702,7 @@
     }
   },
   {
-    "_id": "hP4RYykA92So",
+    "_id": "DO5QK2L7l3gh",
     "name": "University of Pennsylvania",
     "academics.tenMostPopularMajors": {
       "businessmanagementmarketingandrelatedsupportservic": "21%",
@@ -16289,7 +16289,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "No",
-    "applying.websiteUrl": "http://www.upenn.edu",
+    "applying.contactInformation.websiteUrl": "http://www.upenn.edu",
     "applying.applicationFormats.applicationUrl": "https://admissions.upenn.edu/",
     "campusInfo.campusSizeAcres": "299",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -16655,7 +16655,7 @@
     }
   },
   {
-    "_id": "HJ1AXHPMmzsW",
+    "_id": "jmf6bH15Q2oq",
     "name": "Vanderbilt University",
     "academics.tenMostPopularMajors": {
       "socialsciences": "29%",
@@ -17254,7 +17254,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Admissions website translated into languages other than English",
-    "applying.websiteUrl": "http://www.vanderbilt.edu",
+    "applying.contactInformation.websiteUrl": "http://www.vanderbilt.edu",
     "applying.applicationFormats.applicationUrl": "https://admissions.vanderbilt.edu/apply/",
     "campusInfo.campusSizeAcres": "333",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "Yes",
@@ -17675,7 +17675,7 @@
     }
   },
   {
-    "_id": "2oVW1Q7hSq9h",
+    "_id": "5NamYkQiqaha",
     "name": "Yale University",
     "academics.tenMostPopularMajors": {
       "socialsciences": "23%",
@@ -18194,7 +18194,7 @@
     "applying.pte.minimumScoreRequired": "N/A",
     "applying.pte.averageScore": "N/A",
     "applying.internationalRecruitment.admissionsWebsiteTranslated": "Admissions website translated into languages other than English",
-    "applying.websiteUrl": "https://www.yale.edu/",
+    "applying.contactInformation.websiteUrl": "https://www.yale.edu/",
     "applying.applicationFormats.applicationUrl": "https://admissions.yale.edu",
     "campusInfo.campusSizeAcres": "1,108",
     "campusInfo.alcoholPermittedOnCampusForStudentsOfLegalAge": "N/A",
